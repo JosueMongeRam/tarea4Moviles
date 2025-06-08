@@ -1,9 +1,11 @@
 import 'package:fancy_popups_new/fancy_popups_new.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:tarea_2/classes/task.dart';
-import 'package:tarea_2/providers/task_provider.dart';
-import 'package:tarea_2/providers/theme_provider.dart';
+import '../models/task_models.dart'; // CAMBIAR: usar nuevos modelos
+import '../services/task_service.dart'; // AGREGAR: servicio de API
+import '../providers/auth_provider.dart'; // AGREGAR: para obtener usuario activo
+import '../providers/task_provider.dart';
+import '../providers/theme_provider.dart';
 
 class NewTask extends StatefulWidget {
   const NewTask({ super.key });
@@ -16,6 +18,106 @@ class _NewTaskState extends State<NewTask> {
   final TextEditingController _taskNameController = TextEditingController();
   final TextEditingController _taskDescriptionController = TextEditingController();
   String _taskDateController = '';
+  bool _isLoading = false; 
+
+    Future<void> _createTask() async {
+    String taskName = _taskNameController.text.trim();
+    String taskDescription = _taskDescriptionController.text.trim();
+    String taskDate = _taskDateController;
+
+    // Validaciones
+    if (taskName.isEmpty || taskDescription.isEmpty || taskDate.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Por favor completa todos los campos'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    // Obtener usuario activo
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    if (authProvider.currentUser == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('No hay usuario activo'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      // Crear request para la API
+      final createTaskRequest = CreateTaskRequest(
+        taskName: taskName,
+        taskDescription: taskDescription,
+        taskDate: taskDate,
+        taskStatus: '0', // '0' = pendiente, '1' = completada
+        taskUserId: authProvider.currentUser!.userId,
+      );
+
+      // Llamar a la API
+      final taskResponse = await TaskService.createTask(createTaskRequest);
+
+      // Convertir respuesta a modelo local
+      final newTask = Task.fromTaskResponse(taskResponse);
+
+      // Agregar al provider local
+      final taskProvider = Provider.of<TaskProvider>(context, listen: false);
+      await taskProvider.addTask(newTask);
+
+      setState(() {
+        _isLoading = false;
+      });
+
+      // Cerrar diálogo
+      Navigator.of(context).pop();
+
+      // Mostrar mensaje de éxito
+      if (context.mounted) {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return MyFancyPopup(
+              heading: "Success!",
+              body: "Task created successfully!",
+              onClose: () {
+                Navigator.pop(context);
+              },
+              type: Type.success,
+              buttonText: "Continue",
+            );
+          },
+        );
+      }
+
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+
+      // Mostrar error
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error creando tarea: ${e.toString()}'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    _taskNameController.dispose();
+    _taskDescriptionController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,6 +154,7 @@ class _NewTaskState extends State<NewTask> {
               ),
               controller: _taskNameController,
               style: TextStyle(color: theme.textTheme.bodyLarge?.color),
+              enabled: !_isLoading,
             ),
             SizedBox(height: 20),
             TextField(
@@ -70,6 +173,7 @@ class _NewTaskState extends State<NewTask> {
               ),
               controller: _taskDescriptionController,
               style: TextStyle(color: theme.textTheme.bodyLarge?.color),
+              enabled: !_isLoading,
             ),
             SizedBox(height: 20),
             TextField(
@@ -88,6 +192,7 @@ class _NewTaskState extends State<NewTask> {
               ),
               controller: TextEditingController(text: _taskDateController),
               style: TextStyle(color: theme.textTheme.bodyLarge?.color),
+              enabled: !_isLoading,
               onTap: () async {
                 DateTime? pickedDate = await showDatePicker(
                   context: context,
@@ -104,42 +209,7 @@ class _NewTaskState extends State<NewTask> {
             ),
             SizedBox(height: 20),
             ElevatedButton(
-              onPressed: () async {
-                String taskName = _taskNameController.text;
-                String taskDescription = _taskDescriptionController.text;
-                String taskDate = _taskDateController;
-
-                if (taskName.isNotEmpty && taskDescription.isNotEmpty && taskDate.isNotEmpty) {
-                  Task newTask = Task(
-                    name: taskName,
-                    description: taskDescription,
-                    date: taskDate,
-                    status: 'pending', // Nota: cambiado a minúsculas para ser consistente
-                  );
-
-                  await Provider.of<TaskProvider>(context, listen: false).addTask(newTask);
-                  
-                  Navigator.of(context).pop();
-                  
-                  // Mostrar mensaje de éxito
-                  if (context.mounted) {
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return MyFancyPopup(
-                          heading: "Success!",
-                          body: "Task created successfully!",
-                          onClose: () {
-                            Navigator.pop(context);
-                          },
-                          type: Type.success,
-                          buttonText: "Continue",
-                        );
-                      },
-                    );
-                  }
-                }
-              },
+              onPressed: _isLoading ? null : _createTask,
               style: ElevatedButton.styleFrom(
                 backgroundColor: theme.colorScheme.primary,
                 foregroundColor: theme.colorScheme.onPrimary,
@@ -148,7 +218,9 @@ class _NewTaskState extends State<NewTask> {
                   borderRadius: BorderRadius.circular(10),
                 ),
               ),
-              child: Text('Create Task', style: TextStyle(fontSize: 20)),
+              child: _isLoading 
+                ? CircularProgressIndicator(color: Colors.white)
+                : Text('Create Task', style: TextStyle(fontSize: 20)),
             ),
           ],
         ),

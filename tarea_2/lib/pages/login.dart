@@ -78,7 +78,7 @@ class _LoginPageState extends State<LoginPage> {
         // Mostrar error
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error en login: ${e.toString()}'),
+            content: Text('Credenciales incorrectas. Inténtalo de nuevo.'),
             backgroundColor: Colors.red,
           ),
         );

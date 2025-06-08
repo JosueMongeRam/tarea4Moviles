@@ -1,10 +1,11 @@
 import 'package:fancy_popups_new/fancy_popups_new.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:tarea_2/classes/task.dart';
-import 'package:tarea_2/providers/task_provider.dart';
-import 'package:tarea_2/pages/edit_task.dart';
-import 'package:tarea_2/providers/theme_provider.dart';
+import '../models/task_models.dart'; // CAMBIAR: usar nuevos modelos
+import '../providers/task_provider.dart';
+import '../providers/auth_provider.dart'; // AGREGAR: para filtrar por usuario
+import '../pages/edit_task.dart';
+import '../providers/theme_provider.dart';
 
 class TasksList extends StatefulWidget {
   final String tasksCategory;
@@ -28,16 +29,29 @@ class _TasksListState extends State<TasksList> {
   }
   
   void _updateFilteredTasks() {
-    final tasks = Provider.of<TaskProvider>(context).tasks;
-    if(widget.tasksCategory == 'all') {
-      setState(() {
-        filteredTasks = tasks;
-      });
+    final taskProvider = Provider.of<TaskProvider>(context, listen: false); // AGREGAR listen: false
+    final authProvider = Provider.of<AuthProvider>(context, listen: false); // AGREGAR listen: false
+    
+    // Obtener solo las tareas del usuario activo
+    if (authProvider.currentUser != null) {
+      final userTasks = taskProvider.getTasksByUser(authProvider.currentUser!.userId);
+      
+      if (widget.tasksCategory == 'all') {
+        setState(() {
+          filteredTasks = userTasks;
+        });
+      } else if (widget.tasksCategory == 'completed') {
+        setState(() {
+          filteredTasks = userTasks.where((task) => task.taskCompleted).toList();
+        });
+      } else if (widget.tasksCategory == 'pending') {
+        setState(() {
+          filteredTasks = userTasks.where((task) => !task.taskCompleted).toList();
+        });
+      }
     } else {
       setState(() {
-        filteredTasks = tasks.where((task) => 
-          task.status?.toLowerCase() == widget.tasksCategory.toLowerCase()
-        ).toList();
+        filteredTasks = [];
       });
     }
   }
@@ -102,46 +116,55 @@ class _TasksListState extends State<TasksList> {
                       }
                       return theme.primaryColor;
                     }),
-                    value: task.status == 'completed',
+                    value: task.taskCompleted, // CAMBIAR: usar taskCompleted
                     onChanged: ((value) async {
-                      // Update status
-                      task.status = task.status == 'completed' ? 'pending' : 'completed';
-                      
-                      // Update in database
-                      await Provider.of<TaskProvider>(context, listen: false).updateTask(task);
-                      
-                      // Show success message
-                      if (context.mounted) {
-                        showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return MyFancyPopup(
-                              heading: "Success!",
-                              body: "Task updated successfully!",
-                              onClose: () {
-                                Navigator.pop(context);
-                              },
-                              type: Type.success,
-                              buttonText: "Continue",
-                            );
-                          },
-                        );
+                      try {
+                        // Actualizar en API y localmente
+                        await Provider.of<TaskProvider>(context, listen: false)
+                            .toggleTaskCompleted(task.taskId!);
+                        
+                        // Show success message
+                        if (context.mounted) {
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return MyFancyPopup(
+                                heading: "Success!",
+                                body: "Task updated successfully!",
+                                onClose: () {
+                                  Navigator.pop(context);
+                                },
+                                type: Type.success,
+                                buttonText: "Continue",
+                              );
+                            },
+                          );
+                        }
+                        
+                        // Actualizar lista
+                        _updateFilteredTasks();
+                        
+                      } catch (e) {
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Error updating task: ${e.toString()}'),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                        }
                       }
-                      
-                      setState(() {
-                        filteredTasks.removeAt(index);
-                      });
                     }),
                   ),
                   title: Text(
-                    task.name ?? '', 
+                    task.taskTitle, // CAMBIAR: usar taskTitle
                     style: TextStyle(
                       fontSize: 20, 
                       color: theme.textTheme.titleLarge?.color,
                     ),
                   ),
                   subtitle: Text(
-                    '${task.description ?? ''}\n${task.date ?? ''}',
+                    '${task.taskDescription}\n${task.taskDate}', // CAMBIAR: usar nuevos nombres
                     style: TextStyle(
                       fontSize: 16, 
                       color: theme.textTheme.bodyMedium?.color,
@@ -158,7 +181,6 @@ class _TasksListState extends State<TasksList> {
                       if (result == true) {
                         // Actualizar la UI si es necesario
                         setState(() {
-                          // La lista ya debería estar actualizada por el Provider
                           _updateFilteredTasks();
                         });
                       }
@@ -185,31 +207,44 @@ class _TasksListState extends State<TasksList> {
                             ),
                             TextButton(
                               onPressed: () async {
-                                // Delete from database using task ID
-                                if (task.id != null) {
-                                  await Provider.of<TaskProvider>(context, listen: false).deleteTask(task.id!);
-                                }
-                                
-                                setState(() {
-                                  filteredTasks.removeAt(index);
-                                });
+                                try {
+                                  // Delete from API and database using task ID
+                                  if (task.taskId != null) {
+                                    await Provider.of<TaskProvider>(context, listen: false)
+                                        .deleteTask(task.taskId!);
+                                  }
+                                  
+                                  Navigator.pop(context);
 
-                                Navigator.pop(context);
+                                  showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return MyFancyPopup(
+                                        heading: "Success!",
+                                        body: "Task deleted successfully!",
+                                        onClose: () {
+                                          Navigator.pop(context);
+                                        },
+                                        type: Type.success,
+                                        buttonText: "Continue",
+                                      );
+                                    },
+                                  );
 
-                                showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return MyFancyPopup(
-                                      heading: "Success!",
-                                      body: "Task deleted successfully!",
-                                      onClose: () {
-                                        Navigator.pop(context);
-                                      },
-                                      type: Type.success,
-                                      buttonText: "Continue",
+                                  // Actualizar lista
+                                  _updateFilteredTasks();
+
+                                } catch (e) {
+                                  Navigator.pop(context);
+                                  if (context.mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text('Error deleting task: ${e.toString()}'),
+                                        backgroundColor: Colors.red,
+                                      ),
                                     );
-                                  },
-                                );
+                                  }
+                                }
                               },
                               child: const Text("Delete"),
                             ),

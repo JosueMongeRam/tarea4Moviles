@@ -1,11 +1,12 @@
 import 'package:fancy_popups_new/fancy_popups_new.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:tarea_2/classes/task.dart';
-import 'package:tarea_2/providers/task_provider.dart';
+import '../models/task_models.dart'; // CAMBIAR: usar nuevos modelos
+import '../providers/task_provider.dart';
+import '../providers/theme_provider.dart'; // AGREGAR: para tema dinámico
 
 class EditTask extends StatefulWidget {
-  final Task task;
+  final Task task; // Ahora usa Task de task_models.dart
 
   const EditTask({super.key, required this.task});
 
@@ -17,14 +18,15 @@ class _EditTaskState extends State<EditTask> {
   late TextEditingController _taskNameController;
   late TextEditingController _taskDescriptionController;
   late String _taskDateController;
+  bool _isLoading = false; // AGREGAR: estado de carga
 
   @override
   void initState() {
     super.initState();
     // Inicializar los controladores con los valores actuales de la tarea
-    _taskNameController = TextEditingController(text: widget.task.name);
-    _taskDescriptionController = TextEditingController(text: widget.task.description);
-    _taskDateController = widget.task.date!;
+    _taskNameController = TextEditingController(text: widget.task.taskTitle); // CAMBIAR: taskTitle
+    _taskDescriptionController = TextEditingController(text: widget.task.taskDescription); // CAMBIAR: taskDescription
+    _taskDateController = widget.task.taskDate; // CAMBIAR: taskDate
   }
 
   @override
@@ -37,12 +39,18 @@ class _EditTaskState extends State<EditTask> {
 
   @override
   Widget build(BuildContext context) {
+    // Obtener el tema actual
+    final theme = Theme.of(context);
+    
     return AlertDialog(
-      backgroundColor: ThemeData.dark().colorScheme.surface,
+      backgroundColor: theme.colorScheme.surface,
       title: Center(
         child: Text(
           'Edit Task',
-          style: TextStyle(fontSize: 30, color: Colors.white),
+          style: TextStyle(
+            fontSize: 30, 
+            color: theme.textTheme.titleLarge?.color,
+          ),
         ),
       ),
       content: Container(
@@ -57,13 +65,17 @@ class _EditTaskState extends State<EditTask> {
                 border: OutlineInputBorder(),
                 hintText: 'Enter task name',
                 hintStyle: TextStyle(color: Colors.grey),
-                labelStyle: TextStyle(color: Colors.white),
+                labelStyle: TextStyle(color: theme.textTheme.labelLarge?.color),
                 focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.blue, width: 2.0),
+                  borderSide: BorderSide(color: theme.colorScheme.primary, width: 2.0),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: theme.colorScheme.onSurface.withOpacity(0.6)),
                 ),
               ),
               controller: _taskNameController,
-              style: TextStyle(color: Colors.white),
+              style: TextStyle(color: theme.textTheme.bodyLarge?.color),
+              enabled: !_isLoading, // Deshabilitar durante carga
             ),
             SizedBox(height: 20),
             TextField(
@@ -72,13 +84,17 @@ class _EditTaskState extends State<EditTask> {
                 border: OutlineInputBorder(),
                 hintText: 'Enter task description',
                 hintStyle: TextStyle(color: Colors.grey),
-                labelStyle: TextStyle(color: Colors.white),
+                labelStyle: TextStyle(color: theme.textTheme.labelLarge?.color),
                 focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.blue, width: 2.0),
+                  borderSide: BorderSide(color: theme.colorScheme.primary, width: 2.0),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: theme.colorScheme.onSurface.withOpacity(0.6)),
                 ),
               ),
               controller: _taskDescriptionController,
-              style: TextStyle(color: Colors.white),
+              style: TextStyle(color: theme.textTheme.bodyLarge?.color),
+              enabled: !_isLoading, // Deshabilitar durante carga
             ),
             SizedBox(height: 20),
             TextField(
@@ -87,79 +103,127 @@ class _EditTaskState extends State<EditTask> {
                 border: OutlineInputBorder(),
                 hintText: 'Enter task date',
                 hintStyle: TextStyle(color: Colors.grey),
-                labelStyle: TextStyle(color: Colors.white),
+                labelStyle: TextStyle(color: theme.textTheme.labelLarge?.color),
                 focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.blue, width: 2.0),
+                  borderSide: BorderSide(color: theme.colorScheme.primary, width: 2.0),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: theme.colorScheme.onSurface.withOpacity(0.6)),
                 ),
               ),
               controller: TextEditingController(text: _taskDateController),
-              style: TextStyle(color: Colors.white),
+              style: TextStyle(color: theme.textTheme.bodyLarge?.color),
+              enabled: !_isLoading, // Deshabilitar durante carga
               onTap: () async {
-                DateTime? pickedDate = await showDatePicker(
-                  context: context,
-                  initialDate: DateTime.now(),
-                  firstDate: DateTime(2000),
-                  lastDate: DateTime(2100),
-                );
-                if (pickedDate != null) {
-                  setState(() {
-                    _taskDateController = "${pickedDate.day}/${pickedDate.month}/${pickedDate.year}";
-                  });
+                if (!_isLoading) {
+                  DateTime? pickedDate = await showDatePicker(
+                    context: context,
+                    initialDate: DateTime.now(),
+                    firstDate: DateTime(2000),
+                    lastDate: DateTime(2100),
+                  );
+                  if (pickedDate != null) {
+                    setState(() {
+                      _taskDateController = "${pickedDate.day}/${pickedDate.month}/${pickedDate.year}";
+                    });
+                  }
                 }
               },
             ),
             SizedBox(height: 20),
             ElevatedButton(
-              onPressed: () async {
-                String taskName = _taskNameController.text;
-                String taskDescription = _taskDescriptionController.text;
-                String taskDate = _taskDateController;
-
-                if (taskName.isNotEmpty && taskDescription.isNotEmpty && taskDate.isNotEmpty) {
-                  // Actualizar los valores de la tarea
-                  widget.task.name = taskName;
-                  widget.task.description = taskDescription;
-                  widget.task.date = taskDate;
-
-                  // Actualizar en la base de datos
-                  await Provider.of<TaskProvider>(context, listen: false)
-                      .updateTask(widget.task);
-                  
-                  // Cerrar el diálogo
-                  Navigator.of(context).pop(true);
-                  
-                  // Mostrar mensaje de éxito
-                  if (context.mounted) {
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return MyFancyPopup(
-                          heading: "Success!",
-                          body: "Task updated successfully!",
-                          onClose: () {
-                            Navigator.pop(context);
-                          },
-                          type: Type.success,
-                          buttonText: "Continue",
-                        );
-                      },
-                    );
-                  }
-                }
-              },
+              onPressed: _isLoading ? null : _updateTask, // CAMBIAR: nueva función
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue,
+                backgroundColor: theme.colorScheme.primary,
+                foregroundColor: theme.colorScheme.onPrimary,
                 padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
-                textStyle: TextStyle(fontSize: 20, color: Colors.white),
               ),
-              child: Text('Update Task', style: TextStyle(fontSize: 20, color: Colors.white)),
+              child: _isLoading 
+                ? CircularProgressIndicator(color: Colors.white)
+                : Text('Update Task', style: TextStyle(fontSize: 20)),
             ),
           ],
         ),
       ),
     );
+  }
+
+  // NUEVA FUNCIÓN: Actualizar tarea con API
+  Future<void> _updateTask() async {
+    String taskName = _taskNameController.text.trim();
+    String taskDescription = _taskDescriptionController.text.trim();
+    String taskDate = _taskDateController;
+
+    // Validaciones
+    if (taskName.isEmpty || taskDescription.isEmpty || taskDate.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Por favor completa todos los campos'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      // Crear tarea actualizada
+      final updatedTask = Task(
+        taskId: widget.task.taskId,
+        taskTitle: taskName,
+        taskDescription: taskDescription,
+        taskDate: taskDate,
+        taskCompleted: widget.task.taskCompleted,
+        taskUserId: widget.task.taskUserId,
+      );
+
+      // Actualizar en API y localmente
+      await Provider.of<TaskProvider>(context, listen: false)
+          .updateTask(updatedTask);
+
+      setState(() {
+        _isLoading = false;
+      });
+
+      // Cerrar el diálogo devolviendo true para indicar éxito
+      Navigator.of(context).pop(true);
+
+      // Mostrar mensaje de éxito
+      if (context.mounted) {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return MyFancyPopup(
+              heading: "Success!",
+              body: "Task updated successfully!",
+              onClose: () {
+                Navigator.pop(context);
+              },
+              type: Type.success,
+              buttonText: "Continue",
+            );
+          },
+        );
+      }
+
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+
+      // Mostrar error
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error actualizando tarea: ${e.toString()}'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 }

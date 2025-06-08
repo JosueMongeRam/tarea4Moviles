@@ -188,18 +188,19 @@ class Task {
       'taskTitle': taskTitle,
       'taskDescription': taskDescription,
       'taskDate': taskDate,
-      'taskCompleted': taskCompleted ? 1 : 0,
+      'taskCompleted': taskCompleted ? 1 : 0, // SQLite usa INTEGER para boolean
       'taskUserId': taskUserId,
     };
   }
 
+  // Crear Task desde SQLite Map
   factory Task.fromMap(Map<String, dynamic> map) {
     return Task(
       taskId: map['taskId'],
       taskTitle: map['taskTitle'],
       taskDescription: map['taskDescription'],
       taskDate: map['taskDate'],
-      taskCompleted: map['taskCompleted'] == 1,
+      taskCompleted: map['taskCompleted'] == 1, // Convertir INTEGER a boolean
       taskUserId: map['taskUserId'],
     );
   }

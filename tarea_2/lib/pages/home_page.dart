@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:tarea_2/pages/body_home_page.dart';
 import 'package:tarea_2/pages/new_task.dart';
 import 'package:tarea_2/pages/search_task.dart';
+import 'package:tarea_2/providers/task_provider.dart';
 import 'package:tarea_2/providers/theme_provider.dart';
 import 'package:tarea_2/providers/auth_provider.dart'; // Agregar import
 import 'package:tarea_2/pages/login.dart'; // Agregar import
@@ -15,8 +16,15 @@ class HomePage extends StatelessWidget {
     // Obtener el ThemeProvider para conocer el tema actual
     final themeProvider = Provider.of<ThemeProvider>(context);
     final authProvider = Provider.of<AuthProvider>(context); // Agregar AuthProvider
+    final taskProvider = Provider.of<TaskProvider>(context); // AGREGAR
     final isDarkMode = themeProvider.isDarkMode;
     final isAutoMode = themeProvider.isAutoMode;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (authProvider.currentUser != null) {
+        taskProvider.syncTasksForUser(authProvider.currentUser!.userId);
+      }
+    });
 
     return Scaffold(
       appBar: AppBar(
@@ -169,8 +177,13 @@ class HomePage extends StatelessWidget {
                         authProvider.logoutUser(user.userId);
                       },
                     ),
-                    onTap: () {
+                    onTap: () async {  // CAMBIAR: hacer async
                       authProvider.switchUser(user);
+                      
+                      // AGREGAR: Sincronizar tareas del nuevo usuario activo
+                      await Provider.of<TaskProvider>(context, listen: false)
+                          .syncTasksForUser(user.userId);
+                      
                       Navigator.pop(context);
                     },
                   ),

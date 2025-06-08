@@ -1,6 +1,6 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
-import '../classes/task.dart';
+import '../models/task_models.dart'; // CAMBIAR: usar nuevos modelos
 
 class DatabaseHelper {
   static final DatabaseHelper instance = DatabaseHelper._init();
@@ -12,7 +12,6 @@ class DatabaseHelper {
     if (_database != null) return _database!;
     
     try {
-      // Establecer el método de inicialización
       _database = await _initDB('tasks.db');
       print("Database initialized successfully");
       return _database!;
@@ -24,12 +23,10 @@ class DatabaseHelper {
 
   Future<Database> _initDB(String filePath) async {
     try {
-      // Obtener la ubicación de la base de datos según la plataforma
       final dbPath = await getDatabasesPath();
       final path = join(dbPath, filePath);
       print("Database path: $path");
       
-      // Abrir o crear la base de datos
       return await openDatabase(
         path,
         version: 1,
@@ -46,14 +43,15 @@ class DatabaseHelper {
 
   Future<void> _createDB(Database db, int version) async {
     try {
-      // Crear la tabla usando una transacción
+      // ACTUALIZAR: esquema para los nuevos modelos
       await db.execute('''
         CREATE TABLE tasks(
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
-          name TEXT NOT NULL,
-          description TEXT NOT NULL,
-          date TEXT NOT NULL,
-          status TEXT NOT NULL
+          taskId INTEGER PRIMARY KEY AUTOINCREMENT,
+          taskTitle TEXT NOT NULL,
+          taskDescription TEXT NOT NULL,
+          taskDate TEXT NOT NULL,
+          taskCompleted INTEGER NOT NULL DEFAULT 0,
+          taskUserId INTEGER NOT NULL
         )
       ''');
       print("Table created successfully");
@@ -63,24 +61,23 @@ class DatabaseHelper {
     }
   }
 
-  // CRUD operations utilizando transacciones para operaciones críticas
+  // CRUD operations - ACTUALIZADAS para nuevos modelos
   Future<int> insertTask(Task task) async {
     try {
       final db = await instance.database;
-      return await db.insert('tasks', task.toMap());
+      return await db.insert('tasks', task.toMap()); // Usar toMap() de task_models.dart
     } catch (e) {
       print("Error inserting task: $e");
-    rethrow;
+      rethrow;
     }
   }
 
-  // Obtener todas las tareas
   Future<List<Task>> getAllTasks() async {
     try {
       final db = await instance.database;
       final List<Map<String, Object?>> result = await db.query('tasks');
       print("Retrieved ${result.length} tasks from database");
-      return result.map((json) => Task.fromMap(json)).toList();
+      return result.map((json) => Task.fromMap(json)).toList(); // Usar fromMap() de task_models.dart
     } catch (e) {
       print("Error getting all tasks: $e");
       return [];
@@ -94,8 +91,8 @@ class DatabaseHelper {
       return await db.update(
         'tasks',
         task.toMap(),
-        where: 'id = ?',
-        whereArgs: [task.id],
+        where: 'taskId = ?',
+        whereArgs: [task.taskId],
       );
     } catch (e) {
       print("Error updating task: $e");
@@ -109,7 +106,7 @@ class DatabaseHelper {
       final db = await instance.database;
       return await db.delete(
         'tasks',
-        where: 'id = ?',
+        where: 'taskId = ?',
         whereArgs: [id],
       );
     } catch (e) {
@@ -135,7 +132,7 @@ class DatabaseHelper {
     try {
       final db = await instance.database;
       await db.close();
-      _database = null; // Limpiamos la referencia
+      _database = null;
       print("Database closed successfully");
     } catch (e) {
       print("Error closing database: $e");
