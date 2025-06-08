@@ -127,4 +127,20 @@ class User {
       userEmail: response.userEmail,
     );
   }
+
+  factory User.fromJson(Map<String, dynamic> json) {
+    return User(
+      userId: json['userId'],
+      userName: json['userName'],
+      userEmail: json['userEmail'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'userId': userId,
+      'userName': userName,
+      'userEmail': userEmail,
+    };
+  }
 }

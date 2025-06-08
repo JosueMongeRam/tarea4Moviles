@@ -3,6 +3,8 @@ import 'package:tarea_2/models/user_models.dart';
 import 'package:tarea_2/pages/home_page.dart';
 import 'package:tarea_2/pages/user_register.dart';
 import 'package:tarea_2/services/user_service.dart';
+import 'package:provider/provider.dart';
+import '../providers/auth_provider.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -40,6 +42,13 @@ class _LoginPageState extends State<LoginPage> {
         
         // Llamar a la API de login
         final loginResponse = await UserService.login(loginRequest);
+        
+        // Crear objeto User desde la respuesta
+        final user = User.fromLoginResponse(loginResponse);
+        
+        // Agregar usuario al AuthProvider
+        final authProvider = Provider.of<AuthProvider>(context, listen: false);
+        await authProvider.addUser(user);
         
         setState(() {
           _isLoading = false;
