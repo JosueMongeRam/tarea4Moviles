@@ -4,6 +4,8 @@ import 'package:tarea_2/pages/body_home_page.dart';
 import 'package:tarea_2/pages/new_task.dart';
 import 'package:tarea_2/pages/search_task.dart';
 import 'package:tarea_2/providers/theme_provider.dart';
+import 'package:tarea_2/providers/auth_provider.dart'; // Agregar import
+import 'package:tarea_2/pages/login.dart'; // Agregar import
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -12,6 +14,7 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     // Obtener el ThemeProvider para conocer el tema actual
     final themeProvider = Provider.of<ThemeProvider>(context);
+    final authProvider = Provider.of<AuthProvider>(context); // Agregar AuthProvider
     final isDarkMode = themeProvider.isDarkMode;
     final isAutoMode = themeProvider.isAutoMode;
 
@@ -22,6 +25,19 @@ class HomePage extends StatelessWidget {
           style: TextStyle(fontSize: 40, color: Theme.of(context).colorScheme.primary),
         ),
         actions: [
+          // Botón de cuentas (NUEVO)
+          IconButton(
+            icon: Icon(
+              Icons.account_circle,
+              color: Theme.of(context).appBarTheme.foregroundColor,
+            ),
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (context) => _buildAccountDialog(context, authProvider),
+              );
+            },
+          ),
           // Botón para abrir las opciones de tema
           IconButton(
             icon: Icon(
@@ -83,6 +99,153 @@ class HomePage extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  // NUEVO: Diálogo para gestión de cuentas
+  Widget _buildAccountDialog(BuildContext context, AuthProvider authProvider) {
+    return AlertDialog(
+      title: Row(
+        children: [
+          Icon(Icons.account_circle, color: Theme.of(context).colorScheme.primary),
+          SizedBox(width: 8),
+          Text('Gestión de Cuentas'),
+        ],
+      ),
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Usuario activo actual
+            if (authProvider.currentUser != null) ...[
+              Text(
+                'Usuario Activo:',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              ),
+              Container(
+                width: double.infinity,
+                padding: EdgeInsets.all(12),
+                margin: EdgeInsets.symmetric(vertical: 8),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      authProvider.currentUser!.userName,
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    Text(
+                      authProvider.currentUser!.userEmail,
+                      style: TextStyle(color: Colors.grey[600]),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: 16),
+            ],
+
+            // Lista de cuentas disponibles
+            if (authProvider.loggedUsers.length > 1) ...[
+              Text(
+                'Cambiar a otra cuenta:',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              ),
+              SizedBox(height: 8),
+              ...authProvider.loggedUsers.where((user) => user.userId != authProvider.currentUser?.userId).map(
+                (user) => Card(
+                  child: ListTile(
+                    leading: CircleAvatar(
+                      child: Text(user.userName[0].toUpperCase()),
+                    ),
+                    title: Text(user.userName),
+                    subtitle: Text(user.userEmail),
+                    trailing: IconButton(
+                      icon: Icon(Icons.close, color: Colors.red),
+                      onPressed: () {
+                        authProvider.logoutUser(user.userId);
+                      },
+                    ),
+                    onTap: () {
+                      authProvider.switchUser(user);
+                      Navigator.pop(context);
+                    },
+                  ),
+                ),
+              ),
+              SizedBox(height: 16),
+            ],
+
+            // Botón para agregar nueva cuenta
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: () {
+                  Navigator.pop(context); // Cerrar diálogo
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => LoginPage()),
+                  );
+                },
+                icon: Icon(Icons.person_add),
+                label: Text('Agregar Nueva Cuenta'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Theme.of(context).colorScheme.secondary,
+                ),
+              ),
+            ),
+
+            SizedBox(height: 8),
+
+            // Botón para cerrar todas las sesiones
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: Text('Cerrar todas las sesiones'),
+                      content: Text('¿Estás seguro de que quieres cerrar todas las sesiones?'),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: Text('Cancelar'),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            authProvider.logoutAll();
+                            Navigator.of(context).pushAndRemoveUntil(
+                              MaterialPageRoute(builder: (context) => LoginPage()),
+                              (route) => false,
+                            );
+                          },
+                          child: Text('Cerrar Todo', style: TextStyle(color: Colors.red)),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+                icon: Icon(Icons.logout),
+                label: Text('Cerrar Todas las Sesiones'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                  foregroundColor: Colors.white,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text('Cerrar'),
+        ),
+      ],
     );
   }
   
