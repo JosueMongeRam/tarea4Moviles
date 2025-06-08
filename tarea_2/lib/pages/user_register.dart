@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import '../models/user_models.dart';
+import '../services/user_service.dart';
+import 'user_register.dart';
 
 class UserRegisterPage extends StatefulWidget {
   const UserRegisterPage({super.key});
@@ -27,25 +30,51 @@ class _UserRegisterPageState extends State<UserRegisterPage> {
     super.dispose();
   }
 
-  void _handleRegister() {
+  void _handleRegister() async {
     if (_formKey.currentState!.validate() && _acceptTerms) {
       setState(() {
         _isLoading = true;
       });
       
-      // Simular proceso de registro
-      Future.delayed(const Duration(seconds: 2), () {
+      try {
+        // Crear request con los datos del formulario
+        final createUserRequest = CreateUserRequest(
+          userName: _usernameController.text.trim(),
+          userEmail: _emailController.text.trim(),
+          userPassword: _passwordController.text,
+        );
+        
+        // Llamar a la API
+        final userResponse = await UserService.register(createUserRequest);
+        
         setState(() {
           _isLoading = false;
         });
-        // Aquí puedes agregar la lógica de registro
+        
+        // Registro exitoso
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('¡Registro exitoso!'),
+          SnackBar(
+            content: Text('¡Registro exitoso! Bienvenido ${userResponse.userName}'),
             backgroundColor: Colors.green,
           ),
         );
-      });
+        
+        // Navegar de vuelta al login
+        Navigator.pop(context);
+        
+      } catch (e) {
+        setState(() {
+          _isLoading = false;
+        });
+        
+        // Mostrar error
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error en el registro: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     } else if (!_acceptTerms) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(

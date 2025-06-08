@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tarea_2/pages/user_register.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -290,7 +291,12 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                             TextButton(
                               onPressed: () {
-                                // Navegar a registro
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const UserRegisterPage(),
+                                  ),
+                                );
                               },
                               child: const Text(
                                 'Regístrate',
