@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:tarea_2/classes/task_provider.dart';
-import 'package:tarea_2/home_page.dart';
+import 'package:tarea_2/pages/login.dart';
+import 'package:tarea_2/providers/task_provider.dart';
+import 'package:tarea_2/pages/home_page.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:tarea_2/providers/theme_provider.dart';
@@ -50,7 +51,7 @@ class MyApp extends StatelessWidget {
       theme: themeProvider.lightTheme, // Tema claro
       darkTheme: themeProvider.darkTheme, // Tema oscuro
       themeMode: themeProvider.isDarkMode ? ThemeMode.dark : ThemeMode.light, // Modo de tema actual
-      home: const HomePage(),
+      home: const LoginPage(),
     );
   }
 }

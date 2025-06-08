@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "ILAndGgzMAc=",
+  "dgSpecHash": "nLr5ULj5YFQ=",
   "success": true,
-  "projectFilePath": "C:\\Users\\Darkrym\\Desktop\\Moviles\\Tarea4\\tarea_4_api\\my-dotnet-api\\my-dotnet-api.csproj",
+  "projectFilePath": "C:\\Users\\Darkrym\\Desktop\\Moviles\\Tarea4\\tarea4Moviles\\tarea_4_api\\my-dotnet-api\\my-dotnet-api.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Darkrym\\.nuget\\packages\\humanizer.core\\2.14.1\\humanizer.core.2.14.1.nupkg.sha512",
     "C:\\Users\\Darkrym\\.nuget\\packages\\microsoft.aspnetcore.jsonpatch\\8.0.0\\microsoft.aspnetcore.jsonpatch.8.0.0.nupkg.sha512",

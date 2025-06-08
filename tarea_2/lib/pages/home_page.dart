@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:tarea_2/body_home_page.dart';
-import 'package:tarea_2/new_task.dart';
-import 'package:tarea_2/search_task.dart';
+import 'package:tarea_2/pages/body_home_page.dart';
+import 'package:tarea_2/pages/new_task.dart';
+import 'package:tarea_2/pages/search_task.dart';
 import 'package:tarea_2/providers/theme_provider.dart';
 
 class HomePage extends StatelessWidget {

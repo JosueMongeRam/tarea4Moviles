@@ -2962,11 +2962,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Darkrym\\Desktop\\Moviles\\Tarea4\\tarea_4_api\\my-dotnet-api\\my-dotnet-api.csproj",
+      "projectUniqueName": "C:\\Users\\Darkrym\\Desktop\\Moviles\\Tarea4\\tarea4Moviles\\tarea_4_api\\my-dotnet-api\\my-dotnet-api.csproj",
       "projectName": "my-dotnet-api",
-      "projectPath": "C:\\Users\\Darkrym\\Desktop\\Moviles\\Tarea4\\tarea_4_api\\my-dotnet-api\\my-dotnet-api.csproj",
+      "projectPath": "C:\\Users\\Darkrym\\Desktop\\Moviles\\Tarea4\\tarea4Moviles\\tarea_4_api\\my-dotnet-api\\my-dotnet-api.csproj",
       "packagesPath": "C:\\Users\\Darkrym\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Darkrym\\Desktop\\Moviles\\Tarea4\\tarea_4_api\\my-dotnet-api\\obj\\",
+      "outputPath": "C:\\Users\\Darkrym\\Desktop\\Moviles\\Tarea4\\tarea4Moviles\\tarea_4_api\\my-dotnet-api\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\Darkrym\\AppData\\Roaming\\NuGet\\NuGet.Config"

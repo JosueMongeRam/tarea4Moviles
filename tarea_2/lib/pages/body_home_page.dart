@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:tarea_2/tasks_list.dart';
+import 'package:tarea_2/pages/tasks_list.dart';
 
 class BodyHomePage extends StatefulWidget {
   const BodyHomePage({ super.key });

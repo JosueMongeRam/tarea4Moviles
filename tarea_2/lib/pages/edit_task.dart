@@ -2,7 +2,7 @@ import 'package:fancy_popups_new/fancy_popups_new.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tarea_2/classes/task.dart';
-import 'package:tarea_2/classes/task_provider.dart';
+import 'package:tarea_2/providers/task_provider.dart';
 
 class EditTask extends StatefulWidget {
   final Task task;
