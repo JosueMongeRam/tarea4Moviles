@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:tarea_2/models/user_models.dart';
+import 'package:tarea_2/pages/home_page.dart';
 import 'package:tarea_2/pages/user_register.dart';
+import 'package:tarea_2/services/user_service.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -22,25 +25,55 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
-  void _handleLogin() {
+  void _handleLogin() async {
     if (_formKey.currentState!.validate()) {
       setState(() {
         _isLoading = true;
       });
       
-      // Simular proceso de login
-      Future.delayed(const Duration(seconds: 2), () {
+      try {
+        // Crear request con los datos del formulario
+        final loginRequest = LoginRequest(
+          userEmail: _emailController.text.trim(),
+          userPassword: _passwordController.text,
+        );
+        
+        // Llamar a la API de login
+        final loginResponse = await UserService.login(loginRequest);
+        
         setState(() {
           _isLoading = false;
         });
-        // Aquí puedes agregar la lógica de autenticación
+        
+        // Login exitoso
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Login exitoso!'),
+          SnackBar(
+            content: Text('¡Bienvenido ${loginResponse.userName}!'),
             backgroundColor: Colors.green,
           ),
         );
-      });
+        
+        // Navegar a HomePage
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const HomePage(),
+          ),
+        );
+        
+      } catch (e) {
+        setState(() {
+          _isLoading = false;
+        });
+        
+        // Mostrar error
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error en login: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
   }
 
