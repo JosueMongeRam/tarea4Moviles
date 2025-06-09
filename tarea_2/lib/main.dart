@@ -33,7 +33,7 @@ class MyApp extends StatelessWidget {
           theme: themeProvider.lightTheme,
           darkTheme: themeProvider.darkTheme,
           themeMode: themeProvider.isDarkMode ? ThemeMode.dark : ThemeMode.light,
-          home: const AuthWrapper(), // Usar un wrapper separado
+          home: const AuthWrapper(),
         );
       },
     );
@@ -82,11 +82,8 @@ class _AuthWrapperState extends State<AuthWrapper> {
           ),
         ),
       );
-    }
-
-    return Consumer<AuthProvider>(
+    }    return Consumer<AuthProvider>(
       builder: (context, authProvider, child) {
-        print('🚀 AuthWrapper - isLoggedIn: ${authProvider.isLoggedIn}');
         return authProvider.isLoggedIn ? const HomePage() : const LoginPage();
       },
     );

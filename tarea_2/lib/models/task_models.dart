@@ -1,6 +1,3 @@
-// ===============================================
-// Modelo para Task Response (GET task)
-// ===============================================
 class TaskResponse {
   final int taskId;
   final String taskName;
@@ -34,8 +31,6 @@ class TaskResponse {
       userEmail: json['userEmail'],
     );
   }
-
-  // AGREGAR este método que faltaba
   Map<String, dynamic> toJson() {
     return {
       'taskId': taskId,
@@ -51,9 +46,6 @@ class TaskResponse {
 
 }
 
-// ===============================================
-// Modelo para Create Task Request (POST)
-// ===============================================
 class CreateTaskRequest {
   final String taskName;
   final String taskDescription;
@@ -80,9 +72,6 @@ class CreateTaskRequest {
   }
 }
 
-// ===============================================
-// Modelo para Update Task Request (PUT)
-// ===============================================
 class UpdateTaskRequest {
   final String taskName;
   final String taskDescription;
@@ -106,9 +95,6 @@ class UpdateTaskRequest {
   }
 }
 
-// ===============================================
-// Modelo Task local (para la app)
-// ===============================================
 class Task {
   final int? taskId;
   final String taskTitle;
@@ -125,20 +111,16 @@ class Task {
     required this.taskCompleted,
     required this.taskUserId,
   });
-
-  // Convertir desde TaskResponse de la API
   factory Task.fromTaskResponse(TaskResponse response) {
     return Task(
       taskId: response.taskId,
       taskTitle: response.taskName,
       taskDescription: response.taskDescription,
       taskDate: response.taskDate,
-      taskCompleted: response.taskStatus == '1', // '1' = completada, '0' = pendiente
+      taskCompleted: response.taskStatus == '1',
       taskUserId: response.taskUserId,
     );
   }
-
-  // Convertir a CreateTaskRequest para la API
   CreateTaskRequest toCreateRequest() {
     return CreateTaskRequest(
       taskName: taskTitle,
@@ -148,8 +130,6 @@ class Task {
       taskUserId: taskUserId,
     );
   }
-
-  // Convertir a UpdateTaskRequest para la API
   UpdateTaskRequest toUpdateRequest() {
     return UpdateTaskRequest(
       taskName: taskTitle,
@@ -180,32 +160,26 @@ class Task {
       'taskUserId': taskUserId,
     };
   }
-
-  // Para SQLite local (mantener compatibilidad)
   Map<String, dynamic> toMap() {
     return {
       'taskId': taskId,
       'taskTitle': taskTitle,
       'taskDescription': taskDescription,
       'taskDate': taskDate,
-      'taskCompleted': taskCompleted ? 1 : 0, // SQLite usa INTEGER para boolean
+      'taskCompleted': taskCompleted ? 1 : 0,
       'taskUserId': taskUserId,
     };
   }
-
-  // Crear Task desde SQLite Map
   factory Task.fromMap(Map<String, dynamic> map) {
     return Task(
       taskId: map['taskId'],
       taskTitle: map['taskTitle'],
       taskDescription: map['taskDescription'],
       taskDate: map['taskDate'],
-      taskCompleted: map['taskCompleted'] == 1, // Convertir INTEGER a boolean
+      taskCompleted: map['taskCompleted'] == 1,
       taskUserId: map['taskUserId'],
     );
   }
-
-  // Crear copia con cambios
   Task copyWith({
     int? taskId,
     String? taskTitle,

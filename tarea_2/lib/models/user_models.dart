@@ -1,6 +1,3 @@
-// ===============================================
-// Modelo para Login Request
-// ===============================================
 class LoginRequest {
   final String userEmail;
   final String userPassword;
@@ -18,9 +15,6 @@ class LoginRequest {
   }
 }
 
-// ===============================================
-// Modelo para Login Response
-// ===============================================
 class LoginResponse {
   final int userId;
   final String userName;
@@ -44,9 +38,6 @@ class LoginResponse {
   }
 }
 
-// ===============================================
-// Modelo para Create User Request (Registro)
-// ===============================================
 class CreateUserRequest {
   final String userName;
   final String userEmail;
@@ -67,9 +58,6 @@ class CreateUserRequest {
   }
 }
 
-// ===============================================
-// Modelo para User Response (Registro/Get User)
-// ===============================================
 class UserResponse {
   final int userId;
   final String userName;
@@ -98,9 +86,6 @@ class UserResponse {
   }
 }
 
-// ===============================================
-// Modelo básico de Usuario para la app
-// ===============================================
 class User {
   final int userId;
   final String userName;

@@ -5,18 +5,17 @@ import 'package:tarea_2/pages/new_task.dart';
 import 'package:tarea_2/pages/search_task.dart';
 import 'package:tarea_2/providers/task_provider.dart';
 import 'package:tarea_2/providers/theme_provider.dart';
-import 'package:tarea_2/providers/auth_provider.dart'; // Agregar import
-import 'package:tarea_2/pages/login.dart'; // Agregar import
+import 'package:tarea_2/providers/auth_provider.dart';
+import 'package:tarea_2/pages/login.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // Obtener el ThemeProvider para conocer el tema actual
     final themeProvider = Provider.of<ThemeProvider>(context);
-    final authProvider = Provider.of<AuthProvider>(context); // Agregar AuthProvider
-    final taskProvider = Provider.of<TaskProvider>(context); // AGREGAR
+    final authProvider = Provider.of<AuthProvider>(context);
+    final taskProvider = Provider.of<TaskProvider>(context);
     final isDarkMode = themeProvider.isDarkMode;
     final isAutoMode = themeProvider.isAutoMode;
 
@@ -33,7 +32,6 @@ class HomePage extends StatelessWidget {
           style: TextStyle(fontSize: 40, color: Theme.of(context).colorScheme.primary),
         ),
         actions: [
-          // Botón de cuentas (NUEVO)
           IconButton(
             icon: Icon(
               Icons.account_circle,
@@ -46,7 +44,6 @@ class HomePage extends StatelessWidget {
               );
             },
           ),
-          // Botón para abrir las opciones de tema
           IconButton(
             icon: Icon(
               Icons.settings_brightness,
@@ -110,7 +107,6 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  // NUEVO: Diálogo para gestión de cuentas
   Widget _buildAccountDialog(BuildContext context, AuthProvider authProvider) {
     return AlertDialog(
       title: Row(
@@ -125,7 +121,6 @@ class HomePage extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Usuario activo actual
             if (authProvider.currentUser != null) ...[
               Text(
                 'Usuario Activo:',
@@ -156,7 +151,6 @@ class HomePage extends StatelessWidget {
               SizedBox(height: 16),
             ],
 
-            // Lista de cuentas disponibles
             if (authProvider.loggedUsers.length > 1) ...[
               Text(
                 'Cambiar a otra cuenta:',
@@ -177,10 +171,9 @@ class HomePage extends StatelessWidget {
                         authProvider.logoutUser(user.userId);
                       },
                     ),
-                    onTap: () async {  // CAMBIAR: hacer async
+                    onTap: () async { 
                       authProvider.switchUser(user);
                       
-                      // AGREGAR: Sincronizar tareas del nuevo usuario activo
                       await Provider.of<TaskProvider>(context, listen: false)
                           .syncTasksForUser(user.userId);
                       
@@ -192,12 +185,11 @@ class HomePage extends StatelessWidget {
               SizedBox(height: 16),
             ],
 
-            // Botón para agregar nueva cuenta
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
                 onPressed: () {
-                  Navigator.pop(context); // Cerrar diálogo
+                  Navigator.pop(context);
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => LoginPage()),
@@ -213,7 +205,6 @@ class HomePage extends StatelessWidget {
 
             SizedBox(height: 8),
 
-            // Botón para cerrar todas las sesiones
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
@@ -262,14 +253,12 @@ class HomePage extends StatelessWidget {
     );
   }
   
-  // Diálogo para opciones de tema
   Widget _buildThemeDialog(BuildContext context, ThemeProvider themeProvider) {
     return AlertDialog(
       title: Text('Opciones de Tema'),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Opción de modo automático
           SwitchListTile(
             title: Text('Modo Automático'),
             subtitle: Text('Oscuro de 6pm a 6am'),
@@ -280,10 +269,8 @@ class HomePage extends StatelessWidget {
             },
           ),
           
-          // Separador
           Divider(),
           
-          // Opción manual (solo disponible si no está en modo automático)
           ListTile(
             title: Text('Modo Oscuro'),
             trailing: Switch(

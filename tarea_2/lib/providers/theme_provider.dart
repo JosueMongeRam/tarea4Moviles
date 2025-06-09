@@ -10,7 +10,6 @@ class ThemeProvider extends ChangeNotifier {
   static const String _themeKey = 'theme_preference';
   static const String _autoModeKey = 'auto_mode_preference';
 
-  // Getters
   bool get isDarkMode => _isDarkMode;
   bool get isAutoMode => _isAutoMode;
 
@@ -21,7 +20,6 @@ class ThemeProvider extends ChangeNotifier {
     }
   }
 
-  // Cargar las preferencias guardadas
   Future<void> _loadThemeFromPrefs() async {
     final prefs = await SharedPreferences.getInstance();
     _isAutoMode = prefs.getBool(_autoModeKey) ?? false;
@@ -34,55 +32,44 @@ class ThemeProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Guardar preferencias
   Future<void> _saveThemeToPrefs() async {
     final prefs = await SharedPreferences.getInstance();
     prefs.setBool(_themeKey, _isDarkMode);
     prefs.setBool(_autoModeKey, _isAutoMode);
   }
 
-  // Actualizar tema según hora
   void _updateThemeByTime() {
     final now = DateTime.now();
     final hour = now.hour;
     
-    // Modo oscuro entre 6pm (18:00) y 6am (6:00)
     _isDarkMode = hour >= 18 || hour < 6;
   }
 
-  // Iniciar temporizador para actualización automática
   void _startAutoModeTimer() {
-    // Cancelar timer existente si hay uno
     _timer?.cancel();
     
     _updateThemeByTime();
     
-    // Calcular próxima actualización (a las 6am o 6pm)
     DateTime now = DateTime.now();
     DateTime nextUpdate;
     
     if (now.hour < 6) {
-      // Próxima actualización a las 6am
       nextUpdate = DateTime(now.year, now.month, now.day, 6, 0);
     } else if (now.hour < 18) {
-      // Próxima actualización a las 6pm
       nextUpdate = DateTime(now.year, now.month, now.day, 18, 0);
     } else {
-      // Próxima actualización a las 6am del día siguiente
       nextUpdate = DateTime(now.year, now.month, now.day + 1, 6, 0);
     }
     
     Duration timeUntilUpdate = nextUpdate.difference(now);
     
-    // Crear un timer para la próxima actualización
     _timer = Timer(timeUntilUpdate, () {
       _updateThemeByTime();
       notifyListeners();
-      _startAutoModeTimer(); // Configurar el próximo timer
+      _startAutoModeTimer(); 
     });
   }
 
-  // Cambiar entre modo manual y automático
   void setAutoMode(bool value) {
     _isAutoMode = value;
     
@@ -96,7 +83,6 @@ class ThemeProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Cambiar manualmente el tema (solo cuando no está en modo automático)
   void toggleTheme() {
     if (!_isAutoMode) {
       _isDarkMode = !_isDarkMode;
@@ -105,10 +91,8 @@ class ThemeProvider extends ChangeNotifier {
     }
   }
 
-  // Temas definidos
   ThemeData get themeData => _isDarkMode ? darkTheme : lightTheme;
 
-  // Tema oscuro
   ThemeData get darkTheme => ThemeData.dark().copyWith(
     colorScheme: ColorScheme.dark(
       primary: Colors.blue,
@@ -126,7 +110,6 @@ class ThemeProvider extends ChangeNotifier {
     ),
   );
 
-  // Tema claro
   ThemeData get lightTheme => ThemeData.light().copyWith(
     colorScheme: ColorScheme.light(
       primary: Colors.blue,

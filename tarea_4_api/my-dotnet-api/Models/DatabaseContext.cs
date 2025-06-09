@@ -14,7 +14,6 @@ namespace my_dotnet_api.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // Configurar relación User -> Tasks
             modelBuilder.Entity<Task>()
                 .HasOne(t => t.User)
                 .WithMany(u => u.Tasks)

@@ -25,7 +25,6 @@ namespace my_dotnet_api.Models
         [Column("user_password")]
         public string UserPassword { get; set; } = string.Empty;
 
-        // Relación uno a muchos con Tasks
         public virtual ICollection<Task> Tasks { get; set; } = new List<Task>();
     }
 }

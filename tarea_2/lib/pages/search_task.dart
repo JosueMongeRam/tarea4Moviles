@@ -1,9 +1,9 @@
 import 'package:fancy_popups_new/fancy_popups_new.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../models/task_models.dart'; // CAMBIAR: usar nuevos modelos
+import '../models/task_models.dart'; 
 import '../providers/task_provider.dart';
-import '../providers/auth_provider.dart'; // AGREGAR: para filtrar por usuario
+import '../providers/auth_provider.dart'; 
 import '../providers/theme_provider.dart';
 
 class SearchTask extends StatefulWidget {
@@ -27,7 +27,6 @@ class _SearchTaskState extends State<SearchTask> {
     final taskProvider = Provider.of<TaskProvider>(context, listen: false);
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     
-    // Obtener solo las tareas del usuario activo
     if (authProvider.currentUser != null) {
       final userTasks = taskProvider.getTasksByUser(authProvider.currentUser!.userId);
       setState(() {
@@ -46,11 +45,10 @@ class _SearchTaskState extends State<SearchTask> {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     
     if (searchQuery.isEmpty) {
-      _loadUserTasks(); // Si no hay búsqueda, mostrar todas las tareas del usuario
+      _loadUserTasks(); 
       return;
     }
 
-    // Obtener tareas del usuario activo
     List<Task> userTasks = [];
     if (authProvider.currentUser != null) {
       userTasks = taskProvider.getTasksByUser(authProvider.currentUser!.userId);
@@ -85,7 +83,6 @@ class _SearchTaskState extends State<SearchTask> {
   
   @override
   Widget build(BuildContext context) {
-    // Obtener el tema actual
     final theme = Theme.of(context);
     
     return AlertDialog(
@@ -109,7 +106,7 @@ class _SearchTaskState extends State<SearchTask> {
                 ),
               ),
               style: TextStyle(color: theme.textTheme.bodyLarge?.color),
-              onSubmitted: (value) => _searchTasks(), // Buscar al presionar Enter
+              onSubmitted: (value) => _searchTasks(), 
             ),
           ),
           const SizedBox(width: 10),
@@ -122,7 +119,6 @@ class _SearchTaskState extends State<SearchTask> {
               _searchTasks();
             },
           ),
-          // Botón para limpiar búsqueda
           IconButton(
             icon: Icon(
               Icons.clear,
@@ -130,7 +126,7 @@ class _SearchTaskState extends State<SearchTask> {
             ),
             onPressed: () {
               _searchController.clear();
-              _loadUserTasks(); // Mostrar todas las tareas del usuario
+              _loadUserTasks(); 
             },
           ),
         ],
@@ -188,18 +184,18 @@ class _SearchTaskState extends State<SearchTask> {
                             }
                             return theme.primaryColor;
                           }),
-                          value: task.taskCompleted, // CAMBIAR: usar taskCompleted
-                          onChanged: null, // Solo lectura en modo búsqueda
+                          value: task.taskCompleted, 
+                          onChanged: null, 
                         ),
                         title: Text(
-                          task.taskTitle, // CAMBIAR: usar taskTitle
+                          task.taskTitle, 
                           style: TextStyle(
                             fontSize: 20, 
                             color: theme.textTheme.titleLarge?.color,
                           ),
                         ),
                         subtitle: Text(
-                          '${task.taskDescription}\n${task.taskDate}', // CAMBIAR: usar nuevos nombres
+                          '${task.taskDescription}\n${task.taskDate}', 
                           style: TextStyle(
                             fontSize: 16, 
                             color: theme.textTheme.bodyMedium?.color,

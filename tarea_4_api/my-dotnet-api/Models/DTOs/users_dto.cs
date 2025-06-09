@@ -2,21 +2,14 @@ using System.ComponentModel.DataAnnotations;
 
 namespace my_dotnet_api.Models.DTOs
 {
-    // ===============================================
-    // DTOs para: getUser(user_id) y getUsers()
-    // ===============================================
     public class UserResponseDto
     {
         public int UserId { get; set; }
         public string UserName { get; set; } = string.Empty;
         public string UserEmail { get; set; } = string.Empty;
-        // Sin contraseña por seguridad
         public List<TaskDto>? Tasks { get; set; }
     }
 
-    // ===============================================
-    // DTOs para: login(user_email, user_password)
-    // ===============================================
     public class LoginRequestDto
     {
         [Required(ErrorMessage = "El email es requerido")]
@@ -34,13 +27,9 @@ namespace my_dotnet_api.Models.DTOs
         public string UserName { get; set; } = string.Empty;
         public string UserEmail { get; set; } = string.Empty;
         public List<TaskDto>? Tasks { get; set; }
-        // Mensaje de éxito o token (opcional)
         public string Message { get; set; } = "Login exitoso";
     }
 
-    // ===============================================
-    // DTOs para: postUser(user)
-    // ===============================================
     public class CreateUserDto
     {
         [Required(ErrorMessage = "El nombre de usuario es requerido")]
@@ -58,9 +47,6 @@ namespace my_dotnet_api.Models.DTOs
         public string UserPassword { get; set; } = string.Empty;
     }
 
-    // ===============================================
-    // DTOs para: putUser(user_id)
-    // ===============================================
     public class UpdateUserDto
     {
         [Required(ErrorMessage = "El nombre de usuario es requerido")]
@@ -76,14 +62,6 @@ namespace my_dotnet_api.Models.DTOs
         public string? UserPassword { get; set; } // Opcional para actualización
     }
 
-    // ===============================================
-    // DTOs para: deleteUser(user_id)
-    // ===============================================
-    // No necesita DTO específico - solo usa el ID del parámetro
-
-    // ===============================================
-    // DTOs para: getUserTasks(user_id)
-    // ===============================================
     public class UserTasksResponseDto
     {
         public int UserId { get; set; }

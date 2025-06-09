@@ -1,12 +1,12 @@
 import 'package:fancy_popups_new/fancy_popups_new.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../models/task_models.dart'; // CAMBIAR: usar nuevos modelos
+import '../models/task_models.dart';
 import '../providers/task_provider.dart';
-import '../providers/theme_provider.dart'; // AGREGAR: para tema dinámico
+import '../providers/theme_provider.dart';
 
 class EditTask extends StatefulWidget {
-  final Task task; // Ahora usa Task de task_models.dart
+  final Task task; 
 
   const EditTask({super.key, required this.task});
 
@@ -18,20 +18,18 @@ class _EditTaskState extends State<EditTask> {
   late TextEditingController _taskNameController;
   late TextEditingController _taskDescriptionController;
   late String _taskDateController;
-  bool _isLoading = false; // AGREGAR: estado de carga
+  bool _isLoading = false; 
 
   @override
   void initState() {
     super.initState();
-    // Inicializar los controladores con los valores actuales de la tarea
-    _taskNameController = TextEditingController(text: widget.task.taskTitle); // CAMBIAR: taskTitle
-    _taskDescriptionController = TextEditingController(text: widget.task.taskDescription); // CAMBIAR: taskDescription
-    _taskDateController = widget.task.taskDate; // CAMBIAR: taskDate
+    _taskNameController = TextEditingController(text: widget.task.taskTitle);
+    _taskDescriptionController = TextEditingController(text: widget.task.taskDescription);
+    _taskDateController = widget.task.taskDate; 
   }
 
   @override
   void dispose() {
-    // Liberar recursos
     _taskNameController.dispose();
     _taskDescriptionController.dispose();
     super.dispose();
@@ -39,7 +37,6 @@ class _EditTaskState extends State<EditTask> {
 
   @override
   Widget build(BuildContext context) {
-    // Obtener el tema actual
     final theme = Theme.of(context);
     
     return AlertDialog(
@@ -75,7 +72,7 @@ class _EditTaskState extends State<EditTask> {
               ),
               controller: _taskNameController,
               style: TextStyle(color: theme.textTheme.bodyLarge?.color),
-              enabled: !_isLoading, // Deshabilitar durante carga
+              enabled: !_isLoading,
             ),
             SizedBox(height: 20),
             TextField(
@@ -94,7 +91,7 @@ class _EditTaskState extends State<EditTask> {
               ),
               controller: _taskDescriptionController,
               style: TextStyle(color: theme.textTheme.bodyLarge?.color),
-              enabled: !_isLoading, // Deshabilitar durante carga
+              enabled: !_isLoading,
             ),
             SizedBox(height: 20),
             TextField(
@@ -113,7 +110,7 @@ class _EditTaskState extends State<EditTask> {
               ),
               controller: TextEditingController(text: _taskDateController),
               style: TextStyle(color: theme.textTheme.bodyLarge?.color),
-              enabled: !_isLoading, // Deshabilitar durante carga
+              enabled: !_isLoading,
               onTap: () async {
                 if (!_isLoading) {
                   DateTime? pickedDate = await showDatePicker(
@@ -132,7 +129,7 @@ class _EditTaskState extends State<EditTask> {
             ),
             SizedBox(height: 20),
             ElevatedButton(
-              onPressed: _isLoading ? null : _updateTask, // CAMBIAR: nueva función
+              onPressed: _isLoading ? null : _updateTask,
               style: ElevatedButton.styleFrom(
                 backgroundColor: theme.colorScheme.primary,
                 foregroundColor: theme.colorScheme.onPrimary,
@@ -151,13 +148,11 @@ class _EditTaskState extends State<EditTask> {
     );
   }
 
-  // NUEVA FUNCIÓN: Actualizar tarea con API
   Future<void> _updateTask() async {
     String taskName = _taskNameController.text.trim();
     String taskDescription = _taskDescriptionController.text.trim();
     String taskDate = _taskDateController;
 
-    // Validaciones
     if (taskName.isEmpty || taskDescription.isEmpty || taskDate.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -173,7 +168,6 @@ class _EditTaskState extends State<EditTask> {
     });
 
     try {
-      // Crear tarea actualizada
       final updatedTask = Task(
         taskId: widget.task.taskId,
         taskTitle: taskName,
@@ -183,7 +177,6 @@ class _EditTaskState extends State<EditTask> {
         taskUserId: widget.task.taskUserId,
       );
 
-      // Actualizar en API y localmente
       await Provider.of<TaskProvider>(context, listen: false)
           .updateTask(updatedTask);
 
@@ -191,10 +184,8 @@ class _EditTaskState extends State<EditTask> {
         _isLoading = false;
       });
 
-      // Cerrar el diálogo devolviendo true para indicar éxito
       Navigator.of(context).pop(true);
 
-      // Mostrar mensaje de éxito
       if (context.mounted) {
         showDialog(
           context: context,
@@ -217,7 +208,6 @@ class _EditTaskState extends State<EditTask> {
         _isLoading = false;
       });
 
-      // Mostrar error
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Error actualizando tarea: ${e.toString()}'),

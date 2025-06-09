@@ -1,9 +1,9 @@
 import 'package:fancy_popups_new/fancy_popups_new.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../models/task_models.dart'; // CAMBIAR: usar nuevos modelos
-import '../services/task_service.dart'; // AGREGAR: servicio de API
-import '../providers/auth_provider.dart'; // AGREGAR: para obtener usuario activo
+import '../models/task_models.dart';
+import '../services/task_service.dart'; 
+import '../providers/auth_provider.dart'; 
 import '../providers/task_provider.dart';
 import '../providers/theme_provider.dart';
 
@@ -21,96 +21,87 @@ class _NewTaskState extends State<NewTask> {
   bool _isLoading = false; 
 
     Future<void> _createTask() async {
-    String taskName = _taskNameController.text.trim();
-    String taskDescription = _taskDescriptionController.text.trim();
-    String taskDate = _taskDateController;
+      String taskName = _taskNameController.text.trim();
+      String taskDescription = _taskDescriptionController.text.trim();
+      String taskDate = _taskDateController;
 
-    // Validaciones
-    if (taskName.isEmpty || taskDescription.isEmpty || taskDate.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Por favor completa todos los campos'),
-          backgroundColor: Colors.red,
-        ),
-      );
-      return;
-    }
-
-    // Obtener usuario activo
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    if (authProvider.currentUser == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('No hay usuario activo'),
-          backgroundColor: Colors.red,
-        ),
-      );
-      return;
-    }
-
-    setState(() {
-      _isLoading = true;
-    });
-
-    try {
-      // Crear request para la API
-      final createTaskRequest = CreateTaskRequest(
-        taskName: taskName,
-        taskDescription: taskDescription,
-        taskDate: taskDate,
-        taskStatus: '0', // '0' = pendiente, '1' = completada
-        taskUserId: authProvider.currentUser!.userId,
-      );
-
-      // Llamar a la API
-      final taskResponse = await TaskService.createTask(createTaskRequest);
-
-      // Convertir respuesta a modelo local
-      final newTask = Task.fromTaskResponse(taskResponse);
-
-      // Agregar al provider local
-      final taskProvider = Provider.of<TaskProvider>(context, listen: false);
-      await taskProvider.addTask(newTask);
-
-      setState(() {
-        _isLoading = false;
-      });
-
-      // Cerrar diálogo
-      Navigator.of(context).pop();
-
-      // Mostrar mensaje de éxito
-      if (context.mounted) {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return MyFancyPopup(
-              heading: "Success!",
-              body: "Task created successfully!",
-              onClose: () {
-                Navigator.pop(context);
-              },
-              type: Type.success,
-              buttonText: "Continue",
-            );
-          },
+      if (taskName.isEmpty || taskDescription.isEmpty || taskDate.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Por favor completa todos los campos'),
+            backgroundColor: Colors.red,
+          ),
         );
+        return;
       }
 
-    } catch (e) {
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      if (authProvider.currentUser == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('No hay usuario activo'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return;
+      }
+
       setState(() {
-        _isLoading = false;
+        _isLoading = true;
       });
 
-      // Mostrar error
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error creando tarea: ${e.toString()}'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      try {
+        final createTaskRequest = CreateTaskRequest(
+          taskName: taskName,
+          taskDescription: taskDescription,
+          taskDate: taskDate,
+          taskStatus: '0', // '0' = pendiente, '1' = completada
+          taskUserId: authProvider.currentUser!.userId,
+        );
+
+        final taskResponse = await TaskService.createTask(createTaskRequest);
+
+        final newTask = Task.fromTaskResponse(taskResponse);
+
+        final taskProvider = Provider.of<TaskProvider>(context, listen: false);
+        await taskProvider.addTask(newTask);
+
+        setState(() {
+          _isLoading = false;
+        });
+
+        Navigator.of(context).pop();
+
+        if (context.mounted) {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return MyFancyPopup(
+                heading: "Success!",
+                body: "Task created successfully!",
+                onClose: () {
+                  Navigator.pop(context);
+                },
+                type: Type.success,
+                buttonText: "Continue",
+              );
+            },
+          );
+        }
+
+      } catch (e) {
+        setState(() {
+          _isLoading = false;
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error creando tarea: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
-  }
 
   @override
   void dispose() {
@@ -121,7 +112,6 @@ class _NewTaskState extends State<NewTask> {
 
   @override
   Widget build(BuildContext context) {
-    // Obtener el tema actual
     final theme = Theme.of(context);
     
     return AlertDialog(

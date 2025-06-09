@@ -2,9 +2,6 @@ using System.ComponentModel.DataAnnotations;
 
 namespace my_dotnet_api.Models.DTOs
 {
-    // ===============================================
-    // DTOs para: getTask(task_id)
-    // ===============================================
     public class TaskResponseDto
     {
         public int TaskId { get; set; }
@@ -17,9 +14,6 @@ namespace my_dotnet_api.Models.DTOs
         public string? UserEmail { get; set; }
     }
 
-    // ===============================================
-    // DTOs para: postTask(task)
-    // ===============================================
     public class CreateTaskDto
     {
         [Required(ErrorMessage = "El nombre de la tarea es requerido")]
@@ -41,9 +35,6 @@ namespace my_dotnet_api.Models.DTOs
         public int TaskUserId { get; set; }
     }
 
-    // ===============================================
-    // DTOs para: putTask(task_id)
-    // ===============================================
     public class UpdateTaskDto
     {
         [Required(ErrorMessage = "El nombre de la tarea es requerido")]
@@ -62,14 +53,6 @@ namespace my_dotnet_api.Models.DTOs
         public string TaskStatus { get; set; } = string.Empty;
     }
 
-    // ===============================================
-    // DTOs para: deleteTask(task_id)
-    // ===============================================
-    // No necesita DTO específico - solo usa el ID del parámetro
-
-    // ===============================================
-    // DTO base para Tasks (usado en relaciones con Users)
-    // ===============================================
     public class TaskDto
     {
         public int TaskId { get; set; }
@@ -80,15 +63,12 @@ namespace my_dotnet_api.Models.DTOs
         public int TaskUserId { get; set; }
     }
 
-    // ===============================================
-    // DTO simplificado para mostrar tareas en respuestas de usuario
-    // ===============================================
     public class TaskSummaryDto
     {
         public int TaskId { get; set; }
         public string TaskName { get; set; } = string.Empty;
         public string TaskDescription { get; set; } = string.Empty;
-        public string TaskStatus { get; set; } = string.Empty;  // Corregido
-        public int TaskUserId { get; set; }  // Agregado si es necesario
+        public string TaskStatus { get; set; } = string.Empty;
+        public int TaskUserId { get; set; }
     }
 }

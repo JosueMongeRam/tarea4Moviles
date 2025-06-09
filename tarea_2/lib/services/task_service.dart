@@ -3,23 +3,17 @@ import 'package:http/http.dart' as http;
 import '../models/task_models.dart';
 
 class TaskService {
-  // URL base para emulador Android
   static const String baseUrl = 'http://10.0.2.2:5000/api/Tasks';
   static const String usersBaseUrl = 'http://10.0.2.2:5000/api/Users';
 
-
-  // Headers comunes
   static const Map<String, String> headers = {
     'Content-Type': 'application/json',
   };
 
-  // ===============================================
-  // GET: api/Tasks/user/{userId} - Obtener tareas por usuario
-  // ===============================================
   static Future<List<TaskResponse>> getTasksByUser(int userId) async {
     try {
       final response = await http.get(
-        Uri.parse('$usersBaseUrl/$userId/tasks'), // USAR USERS CONTROLLER
+        Uri.parse('$usersBaseUrl/$userId/tasks'),
         headers: headers,
       );
 
@@ -27,17 +21,18 @@ class TaskService {
         final List<dynamic> data = jsonDecode(response.body);
         return data.map((task) => TaskResponse.fromJson(task)).toList();
       } else {
-        throw Exception('Error obteniendo tareas del usuario: ${response.statusCode}');
+        throw Exception(
+          'Error obteniendo tareas del usuario: ${response.statusCode}',
+        );
       }
     } catch (e) {
       throw Exception('Error de conexión obteniendo tareas: $e');
     }
   }
 
-  // ===============================================
-  // POST: api/Tasks - Crear nueva tarea
-  // ===============================================
-  static Future<TaskResponse> createTask(CreateTaskRequest createTaskRequest) async {
+  static Future<TaskResponse> createTask(
+    CreateTaskRequest createTaskRequest,
+  ) async {
     try {
       final response = await http.post(
         Uri.parse(baseUrl),
@@ -56,10 +51,10 @@ class TaskService {
     }
   }
 
-  // ===============================================
-  // PUT: api/Tasks/{id} - Actualizar tarea
-  // ===============================================
-  static Future<TaskResponse> updateTask(int taskId, UpdateTaskRequest updateTaskRequest) async {
+  static Future<TaskResponse> updateTask(
+    int taskId,
+    UpdateTaskRequest updateTaskRequest,
+  ) async {
     try {
       final response = await http.put(
         Uri.parse('$baseUrl/$taskId'),
@@ -78,9 +73,6 @@ class TaskService {
     }
   }
 
-  // ===============================================
-  // DELETE: api/Tasks/{id} - Eliminar tarea
-  // ===============================================
   static Future<bool> deleteTask(int taskId) async {
     try {
       final response = await http.delete(

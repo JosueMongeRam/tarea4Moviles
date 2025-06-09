@@ -35,23 +35,18 @@ class _UserRegisterPageState extends State<UserRegisterPage> {
       setState(() {
         _isLoading = true;
       });
-      
-      try {
-        // Crear request con los datos del formulario
+        try {
         final createUserRequest = CreateUserRequest(
           userName: _usernameController.text.trim(),
           userEmail: _emailController.text.trim(),
           userPassword: _passwordController.text,
         );
         
-        // Llamar a la API
         final userResponse = await UserService.register(createUserRequest);
         
         setState(() {
-          _isLoading = false;
-        });
+          _isLoading = false;        });
         
-        // Registro exitoso
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('¡Registro exitoso! Bienvenido ${userResponse.userName}'),
@@ -59,15 +54,12 @@ class _UserRegisterPageState extends State<UserRegisterPage> {
           ),
         );
         
-        // Navegar de vuelta al login
         Navigator.pop(context);
         
       } catch (e) {
         setState(() {
-          _isLoading = false;
-        });
+          _isLoading = false;        });
         
-        // Mostrar error
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Error en el registro: ${e.toString()}'),
@@ -115,7 +107,6 @@ class _UserRegisterPageState extends State<UserRegisterPage> {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        // Logo o icono
                         Container(
                           width: 80,
                           height: 80,
@@ -131,7 +122,6 @@ class _UserRegisterPageState extends State<UserRegisterPage> {
                         ),
                         const SizedBox(height: 24),
                         
-                        // Título
                         const Text(
                           'Crear Cuenta',
                           style: TextStyle(
@@ -150,7 +140,6 @@ class _UserRegisterPageState extends State<UserRegisterPage> {
                         ),
                         const SizedBox(height: 32),
                         
-                        // Campo de nombre de usuario
                         TextFormField(
                           controller: _usernameController,
                           decoration: InputDecoration(
@@ -180,7 +169,6 @@ class _UserRegisterPageState extends State<UserRegisterPage> {
                         ),
                         const SizedBox(height: 16),
                         
-                        // Campo de email
                         TextFormField(
                           controller: _emailController,
                           keyboardType: TextInputType.emailAddress,
@@ -212,7 +200,6 @@ class _UserRegisterPageState extends State<UserRegisterPage> {
                         ),
                         const SizedBox(height: 16),
                         
-                        // Campo de contraseña
                         TextFormField(
                           controller: _passwordController,
                           obscureText: _obscurePassword,
@@ -255,7 +242,6 @@ class _UserRegisterPageState extends State<UserRegisterPage> {
                         ),
                         const SizedBox(height: 16),
                         
-                        // Campo de confirmación de contraseña
                         TextFormField(
                           controller: _confirmPasswordController,
                           obscureText: _obscureConfirmPassword,
@@ -298,7 +284,6 @@ class _UserRegisterPageState extends State<UserRegisterPage> {
                         ),
                         const SizedBox(height: 16),
                         
-                        // Checkbox términos y condiciones
                         Row(
                           children: [
                             Checkbox(
@@ -341,7 +326,6 @@ class _UserRegisterPageState extends State<UserRegisterPage> {
                         ),
                         const SizedBox(height: 24),
                         
-                        // Botón de registro
                         SizedBox(
                           width: double.infinity,
                           height: 50,
@@ -370,7 +354,6 @@ class _UserRegisterPageState extends State<UserRegisterPage> {
                         ),
                         const SizedBox(height: 24),
                         
-                        // Divider
                         Row(
                           children: const [
                             Expanded(child: Divider()),
@@ -383,13 +366,11 @@ class _UserRegisterPageState extends State<UserRegisterPage> {
                         ),
                         const SizedBox(height: 24),
                         
-                        // Social register buttons
                         Row(
                           children: [
                             Expanded(
                               child: OutlinedButton.icon(
                                 onPressed: () {
-                                  // Google register
                                 },
                                 icon: const Icon(Icons.g_mobiledata, size: 24),
                                 label: const Text('Google'),
@@ -405,7 +386,6 @@ class _UserRegisterPageState extends State<UserRegisterPage> {
                             Expanded(
                               child: OutlinedButton.icon(
                                 onPressed: () {
-                                  // Facebook register
                                 },
                                 icon: const Icon(Icons.facebook, size: 24),
                                 label: const Text('Facebook'),
@@ -421,7 +401,6 @@ class _UserRegisterPageState extends State<UserRegisterPage> {
                         ),
                         const SizedBox(height: 24),
                         
-                        // Login link
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -431,7 +410,6 @@ class _UserRegisterPageState extends State<UserRegisterPage> {
                             ),
                             TextButton(
                               onPressed: () {
-                                // Navegar a login
                                 Navigator.pop(context);
                               },
                               child: const Text(

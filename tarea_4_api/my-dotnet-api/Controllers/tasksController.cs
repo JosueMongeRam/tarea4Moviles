@@ -49,14 +49,12 @@ namespace my_dotnet_api.Controllers
         [HttpPost]
         public async Task<ActionResult<TaskResponseDto>> PostTask(CreateTaskDto createTaskDto)
         {
-            // Verificar que el usuario existe
             var userExists = await _context.Users.AnyAsync(u => u.UserId == createTaskDto.TaskUserId);
             if (!userExists)
             {
                 return BadRequest($"Usuario con ID {createTaskDto.TaskUserId} no existe");
             }
 
-            // Convertir DTO a modelo
             var task = new Models.Task
             {
                 TaskName = createTaskDto.TaskName,
@@ -69,7 +67,6 @@ namespace my_dotnet_api.Controllers
             _context.Tasks.Add(task);
             await _context.SaveChangesAsync();
 
-            // Obtener la tarea con información del usuario
             var createdTask = await _context.Tasks
                 .Include(t => t.User)
                 .FirstOrDefaultAsync(t => t.TaskId == task.TaskId);
@@ -79,7 +76,6 @@ namespace my_dotnet_api.Controllers
                 return StatusCode(500, "Error al crear la tarea");
             }
 
-            // Convertir a DTO de respuesta
             var taskResponse = new TaskResponseDto
             {
                 TaskId = createdTask.TaskId,
@@ -107,7 +103,6 @@ namespace my_dotnet_api.Controllers
                 return NotFound($"Tarea con ID {id} no encontrada");
             }
 
-            // Actualizar propiedades
             task.TaskName = updateTaskDto.TaskName;
             task.TaskDescription = updateTaskDto.TaskDescription;
             task.TaskDate = updateTaskDto.TaskDate;
@@ -116,7 +111,6 @@ namespace my_dotnet_api.Controllers
             _context.Entry(task).State = EntityState.Modified;
             await _context.SaveChangesAsync();
 
-            // Retornar DTO de respuesta
             var taskResponse = new TaskResponseDto
             {
                 TaskId = task.TaskId,

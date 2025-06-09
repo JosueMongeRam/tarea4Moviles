@@ -1,9 +1,9 @@
 import 'package:fancy_popups_new/fancy_popups_new.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../models/task_models.dart'; // CAMBIAR: usar nuevos modelos
+import '../models/task_models.dart'; 
 import '../providers/task_provider.dart';
-import '../providers/auth_provider.dart'; // AGREGAR: para filtrar por usuario
+import '../providers/auth_provider.dart'; 
 import '../pages/edit_task.dart';
 import '../providers/theme_provider.dart';
 
@@ -29,18 +29,13 @@ class _TasksListState extends State<TasksList> {
   }
   
   void _updateFilteredTasks() {
-    final taskProvider = Provider.of<TaskProvider>(context, listen: false); // AGREGAR listen: false
-    final authProvider = Provider.of<AuthProvider>(context, listen: false); // AGREGAR listen: false
+    final taskProvider = Provider.of<TaskProvider>(context, listen: false);
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
     
-    // Obtener solo las tareas del usuario activo
     if (authProvider.currentUser != null) {
       final userTasks = taskProvider.getTasksByUser(authProvider.currentUser!.userId);
       
-      if (widget.tasksCategory == 'all') {
-        setState(() {
-          filteredTasks = userTasks;
-        });
-      } else if (widget.tasksCategory == 'completed') {
+      if (widget.tasksCategory == 'completed') {
         setState(() {
           filteredTasks = userTasks.where((task) => task.taskCompleted).toList();
         });
@@ -58,10 +53,8 @@ class _TasksListState extends State<TasksList> {
 
   @override
   Widget build(BuildContext context) {
-    // Always refresh the list when building
     _updateFilteredTasks();
     
-    // Obtener el tema actual
     final theme = Theme.of(context);
     
     if (filteredTasks.isEmpty) {
@@ -116,14 +109,12 @@ class _TasksListState extends State<TasksList> {
                       }
                       return theme.primaryColor;
                     }),
-                    value: task.taskCompleted, // CAMBIAR: usar taskCompleted
+                    value: task.taskCompleted, 
                     onChanged: ((value) async {
                       try {
-                        // Actualizar en API y localmente
                         await Provider.of<TaskProvider>(context, listen: false)
                             .toggleTaskCompleted(task.taskId!);
                         
-                        // Show success message
                         if (context.mounted) {
                           showDialog(
                             context: context,
@@ -141,7 +132,6 @@ class _TasksListState extends State<TasksList> {
                           );
                         }
                         
-                        // Actualizar lista
                         _updateFilteredTasks();
                         
                       } catch (e) {
@@ -157,14 +147,14 @@ class _TasksListState extends State<TasksList> {
                     }),
                   ),
                   title: Text(
-                    task.taskTitle, // CAMBIAR: usar taskTitle
+                    task.taskTitle,
                     style: TextStyle(
                       fontSize: 20, 
                       color: theme.textTheme.titleLarge?.color,
                     ),
                   ),
                   subtitle: Text(
-                    '${task.taskDescription}\n${task.taskDate}', // CAMBIAR: usar nuevos nombres
+                    '${task.taskDescription}\n${task.taskDate}', 
                     style: TextStyle(
                       fontSize: 16, 
                       color: theme.textTheme.bodyMedium?.color,
@@ -177,9 +167,7 @@ class _TasksListState extends State<TasksList> {
                         builder: (context) => EditTask(task: task),
                       );
                       
-                      // Si el resultado es true, la actualización fue exitosa
                       if (result == true) {
-                        // Actualizar la UI si es necesario
                         setState(() {
                           _updateFilteredTasks();
                         });
@@ -208,7 +196,6 @@ class _TasksListState extends State<TasksList> {
                             TextButton(
                               onPressed: () async {
                                 try {
-                                  // Delete from API and database using task ID
                                   if (task.taskId != null) {
                                     await Provider.of<TaskProvider>(context, listen: false)
                                         .deleteTask(task.taskId!);
@@ -231,7 +218,6 @@ class _TasksListState extends State<TasksList> {
                                     },
                                   );
 
-                                  // Actualizar lista
                                   _updateFilteredTasks();
 
                                 } catch (e) {

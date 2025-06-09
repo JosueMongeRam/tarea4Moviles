@@ -3,17 +3,11 @@ import 'package:http/http.dart' as http;
 import '../models/user_models.dart';
 
 class UserService {
-  // URL base para emulador Android
   static const String baseUrl = 'http://10.0.2.2:5000/api/Users';
 
-  // Headers comunes
   static const Map<String, String> headers = {
-    'Content-Type': 'application/json',
-  };
+    'Content-Type': 'application/json',  };
 
-  // ===============================================
-  // POST: api/Users/login - Login de usuario
-  // ===============================================
   static Future<LoginResponse> login(LoginRequest loginRequest) async {
     try {
       final response = await http.post(
@@ -30,12 +24,8 @@ class UserService {
       }
     } catch (e) {
       throw Exception('Error de conexión en login: $e');
-    }
-  }
+    }  }
 
-  // ===============================================
-  // POST: api/Users - Registro de usuario
-  // ===============================================
   static Future<UserResponse> register(CreateUserRequest createUserRequest) async {
     try {
       final response = await http.post(
@@ -52,12 +42,8 @@ class UserService {
       }
     } catch (e) {
       throw Exception('Error de conexión en registro: $e');
-    }
-  }
+    }  }
 
-  // ===============================================
-  // GET: api/Users/{id} - Obtener usuario por ID
-  // ===============================================
   static Future<UserResponse> getUserById(int userId) async {
     try {
       final response = await http.get(
@@ -73,12 +59,8 @@ class UserService {
       }
     } catch (e) {
       throw Exception('Error de conexión obteniendo usuario: $e');
-    }
-  }
+    }  }
 
-  // ===============================================
-  // GET: api/Users - Obtener todos los usuarios
-  // ===============================================
   static Future<List<UserResponse>> getAllUsers() async {
     try {
       final response = await http.get(
@@ -113,12 +95,8 @@ class UserService {
       }
     } catch (e) {
       throw Exception('Error de conexión actualizando usuario: $e');
-    }
-  }
+    }  }
 
-  // ===============================================
-  // DELETE: api/Users/{id} - Eliminar usuario
-  // ===============================================
   static Future<bool> deleteUser(int userId) async {
     try {
       final response = await http.delete(
@@ -133,12 +111,8 @@ class UserService {
       }
     } catch (e) {
       throw Exception('Error de conexión eliminando usuario: $e');
-    }
-  }
+    }  }
 
-  // ===============================================
-  // GET: api/Users/{id}/tasks - Obtener tareas del usuario
-  // ===============================================
   static Future<List<dynamic>> getUserTasks(int userId) async {
     try {
       final response = await http.get(

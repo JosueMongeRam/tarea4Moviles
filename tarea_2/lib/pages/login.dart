@@ -34,19 +34,15 @@ class _LoginPageState extends State<LoginPage> {
       });
       
       try {
-        // Crear request con los datos del formulario
         final loginRequest = LoginRequest(
           userEmail: _emailController.text.trim(),
           userPassword: _passwordController.text,
         );
         
-        // Llamar a la API de login
         final loginResponse = await UserService.login(loginRequest);
         
-        // Crear objeto User desde la respuesta
         final user = User.fromLoginResponse(loginResponse);
         
-        // Agregar usuario al AuthProvider
         final authProvider = Provider.of<AuthProvider>(context, listen: false);
         await authProvider.addUser(user);
         
@@ -54,7 +50,6 @@ class _LoginPageState extends State<LoginPage> {
           _isLoading = false;
         });
         
-        // Login exitoso
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('¡Bienvenido ${loginResponse.userName}!'),
@@ -62,7 +57,6 @@ class _LoginPageState extends State<LoginPage> {
           ),
         );
         
-        // Navegar a HomePage
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -75,7 +69,6 @@ class _LoginPageState extends State<LoginPage> {
           _isLoading = false;
         });
         
-        // Mostrar error
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Credenciales incorrectas. Inténtalo de nuevo.'),
@@ -116,7 +109,6 @@ class _LoginPageState extends State<LoginPage> {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        // Logo o icono
                         Container(
                           width: 80,
                           height: 80,
@@ -132,7 +124,6 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                         const SizedBox(height: 24),
                         
-                        // Título
                         const Text(
                           'Bienvenido',
                           style: TextStyle(
@@ -151,7 +142,6 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                         const SizedBox(height: 32),
                         
-                        // Campo de email
                         TextFormField(
                           controller: _emailController,
                           keyboardType: TextInputType.emailAddress,
@@ -183,7 +173,6 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                         const SizedBox(height: 16),
                         
-                        // Campo de contraseña
                         TextFormField(
                           controller: _passwordController,
                           obscureText: _obscurePassword,
@@ -226,12 +215,10 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                         const SizedBox(height: 8),
                         
-                        // Forgot password
                         Align(
                           alignment: Alignment.centerRight,
                           child: TextButton(
                             onPressed: () {
-                              // Lógica para recuperar contraseña
                             },
                             child: const Text(
                               '¿Olvidaste tu contraseña?',
@@ -243,7 +230,6 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                         const SizedBox(height: 24),
                         
-                        // Botón de login
                         SizedBox(
                           width: double.infinity,
                           height: 50,
@@ -272,7 +258,6 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                         const SizedBox(height: 24),
                         
-                        // Divider
                         Row(
                           children: const [
                             Expanded(child: Divider()),
@@ -285,13 +270,11 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                         const SizedBox(height: 24),
                         
-                        // Social login buttons
                         Row(
                           children: [
                             Expanded(
                               child: OutlinedButton.icon(
                                 onPressed: () {
-                                  // Google login
                                 },
                                 icon: const Icon(Icons.g_mobiledata, size: 24),
                                 label: const Text('Google'),
@@ -307,7 +290,6 @@ class _LoginPageState extends State<LoginPage> {
                             Expanded(
                               child: OutlinedButton.icon(
                                 onPressed: () {
-                                  // Facebook login
                                 },
                                 icon: const Icon(Icons.facebook, size: 24),
                                 label: const Text('Facebook'),
@@ -323,7 +305,6 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                         const SizedBox(height: 24),
                         
-                        // Sign up link
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
